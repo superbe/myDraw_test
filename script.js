@@ -41,7 +41,7 @@ class doker{
 	* @param {event} event - параметры обрабатываемого события.
 	*/
 	_select(event){
-		var cleare_elements = document.getElementsByClassName(this._class_name);
+		let cleare_elements = document.getElementsByClassName(this._class_name);
 		for (let cleare_element of cleare_elements) {
 			cleare_element.classList.remove(this._select_class);
 		}
@@ -189,6 +189,9 @@ class line {
 	* @param {point} value - начальная координатная точка.
 	*/
 	start_line(value) {
+		
+		console.log(value);
+		
 		this._points.push(value);
         this._ctx.strokeStyle = this._color;
         this._ctx.lineWidth = this._thickness;
@@ -245,7 +248,7 @@ class drawingApp {
 	constructor() {
 		this._palette = new palette();
 		this._thickness = new thickness();
-        this._canvas = document.getElementById('draw_area');
+        this._canvas = document.querySelector('.draw-area');
 		this._width = this._canvas.width;
         this._height = this._canvas.height;
 		this._canvas.addEventListener('mousedown', this._press.bind(this), false);
@@ -309,7 +312,7 @@ class drawingApp {
 	_press(event){
 		this._shape_id = +new Date;
 		let new_line = new line(this._shape_id, this._ctx, this._palette.color, this._thickness.value);
-		new_line.start_line(new point(event.clientX - event.path[1].offsetLeft - event.path[0].offsetLeft, event.clientY - event.path[1].offsetTop - event.path[0].offsetTop));
+		new_line.start_line(new point(event.offsetX, event.offsetY));
 		this._shapes.push(new_line);
 	}
 	
@@ -320,7 +323,7 @@ class drawingApp {
 	*/
 	_drag(event){
 		if (this._shape_id) {
-			this._shapes[this._shapes.length - 1].add_point(new point(event.clientX - event.path[1].offsetLeft - event.path[0].offsetLeft, event.clientY - event.path[1].offsetTop - event.path[0].offsetTop));
+			this._shapes[this._shapes.length - 1].add_point(new point(event.offsetX, event.offsetY));
 		}
 	}
 	

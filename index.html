@@ -1,16 +1,14 @@
-<!doctype html> 
-<html> 
-<head> 
-	<title>Редактор изображения</title> 
+<!doctype html>
+<head>
+	<title>Редактор изображения</title>
 	<meta charset="UTF-8"> 
 	<meta name="viewport" content="width=device-width,user-scalable=no" />
 	<link rel="stylesheet" href="style.css"> 
-	<script src="script.js" type="text/javascript"></script>
 </head> 
 <body>
 <div class="container">
-	<div class="editor-area">
-		<canvas id="draw_area"></canvas>
+	<div class="container__editor-area">
+		<canvas class="draw-area"></canvas>
 		<div class="palette-area">
 			<div id="color_red" title="Color: red" data-color="red" class="div-area-item palette div-area-item-color-select color-red"></div>
 			<div id="color_green" title="Color: green" data-color="green" class="div-area-item palette color-green"></div>
@@ -27,8 +25,9 @@
 		<button id="save_button">Сохранить</button>
 	</div>
 </div>
+</body>
+<script src="script.js" type="text/javascript"></script>
 <script type="text/javascript">
 	var app = new drawingApp();
 </script>
-</body> 
 </html>
