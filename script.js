@@ -14,14 +14,14 @@ class doker{
 	/**
 	* Конструктор.
 	* 
-	* @param {string} class_name - наименование класса html элемента к 
-	* которому будет привязан специализированная палитра инструментов.
+	* @param {string} selector - селектор html элемента к которому будет 
+	* привязана специализированная палитра инструментов.
 	* @param {string} select_class - наименование класса стиля определяющего 
 	* выбранный элемент палитры инструментов.
 	*/
-	constructor(class_name, select_class) {
-		this._class_name = class_name;
-		this._select_class = select_class;
+	constructor(selector, selected_class) {
+		this._selector = selector;
+		this._selected_class = selected_class;
 		this._init();
 	}
 	
@@ -30,9 +30,8 @@ class doker{
 	* 
 	*/
 	_init(){
-		for (let element of document.getElementsByClassName(this._class_name)) {
-			element.addEventListener("click", this._select.bind(this), false);
-		}
+		document.querySelectorAll(this._selector)
+			.forEach(element => element.addEventListener("click", this._select.bind(this), false));
 	}
 	
 	/**
@@ -41,11 +40,9 @@ class doker{
 	* @param {event} event - параметры обрабатываемого события.
 	*/
 	_select(event){
-		let cleare_elements = document.getElementsByClassName(this._class_name);
-		for (let cleare_element of cleare_elements) {
-			cleare_element.classList.remove(this._select_class);
-		}
-		event.target.classList.toggle(this._select_class);
+		document.querySelectorAll(this._selector)
+			.forEach(element => element.classList.remove(this._selected_class));
+		event.target.classList.toggle(this._selected_class);
 	}
 };
 
@@ -59,7 +56,7 @@ class palette extends doker{
 	* 
 	*/
 	constructor() {
-		super('palette', 'div-area-item-color-select')
+		super('.color-palette__item', 'color-palette__item_selected')
 	}
 	
 	/**
@@ -68,7 +65,8 @@ class palette extends doker{
 	* @returns {string} - наименовани выбранного цвета из палитры.
 	*/
 	get color() {
-		return document.getElementsByClassName(this._select_class)[0].attributes['data-color'].value;
+		return document.querySelector('.' + this._selected_class)
+			.attributes['data-color'].value;
 	}
 };
 
@@ -82,7 +80,7 @@ class thickness extends doker{
 	* 
 	*/
 	constructor() {
-		super('thickness', 'div-area-item-thickness-select')
+		super('.pen-thickness-palette__item', 'pen-thickness-palette__item_selected')
 	}
 	
 	/**
@@ -91,7 +89,8 @@ class thickness extends doker{
 	* @returns {number} - значение выбранного размера пера.
 	*/
 	get value() {
-		return parseInt(document.getElementsByClassName(this._select_class)[0].attributes['data-thickness'].value);
+		return parseInt(document.querySelector('.' + this._selected_class)
+			.attributes['data-thickness'].value);
 	}
 };
 
@@ -152,7 +151,6 @@ class point {
 	}
 };
 
-
 /**
 * Класс примитива "линия".
 * 
@@ -189,9 +187,6 @@ class line {
 	* @param {point} value - начальная координатная точка.
 	*/
 	start_line(value) {
-		
-		console.log(value);
-		
 		this._points.push(value);
         this._ctx.strokeStyle = this._color;
         this._ctx.lineWidth = this._thickness;
@@ -225,12 +220,16 @@ class line {
 	* из локального хранилища.
 	*/
 	static getline(ctx, value) {
-		let result = new line(value._id, ctx, value._color, value._thickness, value._line_cap, value._line_join);
+		let result = new line(value._id, 
+							  ctx, 
+							  value._color, 
+							  value._thickness, 
+							  value._line_cap, 
+							  value._line_join);
 		if (value._points.length > 1){
 			result.start_line(new point(value._points[0]._x, value._points[0]._y));
-			for (let i = 1; i < value._points.length; i ++) {
-				result.add_point(new point(value._points[i]._x, value._points[i]._y));
-			}
+			value._points
+				.forEach(_point => result.add_point(new point(_point._x, _point._y)));
 		}
 		return result;
 	}
@@ -258,8 +257,10 @@ class drawingApp {
 		this._shapes = [];
         this._ctx = this._canvas.getContext('2d');
 		document.addEventListener('DOMContentLoaded', this._load.bind(this), false);
-		document.getElementById('save_button').addEventListener('click', this._save.bind(this), false);
-		document.getElementById('clear_button').addEventListener('click', this._clear.bind(this), false);
+		document.querySelector('.button_save')
+			.addEventListener('click', this._save.bind(this), false);
+		document.querySelector('.button_clear')
+			.addEventListener('click', this._clear.bind(this), false);
 		window.addEventListener('storage', this._load.bind(this), false);
 	}
 	
@@ -283,14 +284,13 @@ class drawingApp {
 			// TODO: если на одной вкладке почистили холст и сохранили надо ли 
 			// на другой вкладке так же все очистить или оставить как есть?
 			// Пока на другой вкладке ничего не трогаем.
-			let combined_shapes = Array.from(new Set(JSON.parse(localStorage.getItem('myDraw.shapes')).concat(JSON.parse(JSON.stringify(this._shapes)))));
+			let combined_shapes = Array.from(new Set(JSON.parse(localStorage.getItem('myDraw.shapes'))
+														.concat(JSON.parse(JSON.stringify(this._shapes)))))
+				.filter(shape => shape._points.length > 1);
 			combined_shapes.sort((a, b) => a._id - b._id);
 			this._clear(event);
-			for(let shape of combined_shapes){
-				if (shape._points.length > 1){
-					this._shapes.push(line.getline(this._ctx, shape));
-				}
-			}
+			this._shapes = combined_shapes
+				.map(shape => line.getline(this._ctx, shape));
 		}
 	}
 
@@ -311,7 +311,10 @@ class drawingApp {
 	*/
 	_press(event){
 		this._shape_id = +new Date;
-		let new_line = new line(this._shape_id, this._ctx, this._palette.color, this._thickness.value);
+		let new_line = new line(this._shape_id, 
+								this._ctx, 
+								this._palette.color, 
+								this._thickness.value);
 		new_line.start_line(new point(event.offsetX, event.offsetY));
 		this._shapes.push(new_line);
 	}
@@ -323,7 +326,8 @@ class drawingApp {
 	*/
 	_drag(event){
 		if (this._shape_id) {
-			this._shapes[this._shapes.length - 1].add_point(new point(event.offsetX, event.offsetY));
+			this._shapes[this._shapes.length - 1]
+				.add_point(new point(event.offsetX, event.offsetY));
 		}
 	}
 	

@@ -9,20 +9,20 @@
 <div class="container">
 	<div class="container__editor-area">
 		<canvas class="draw-area"></canvas>
-		<div class="palette-area">
-			<div id="color_red" title="Color: red" data-color="red" class="div-area-item palette div-area-item-color-select color-red"></div>
-			<div id="color_green" title="Color: green" data-color="green" class="div-area-item palette color-green"></div>
-			<div id="color_blue" title="Color: blue" data-color="blue" class="div-area-item palette color-blue"></div>
-			<div id="color_white" title="Color: white" data-color="white" class="div-area-item palette color-white"></div>
-			<div id="color_black" title="Color: black" data-color="black" class="div-area-item palette color-black"></div>
+		<div class="color-palette">
+			<div class="color-palette__item color-palette__item_color_red color-palette__item_selected" title="Красный" data-color="red"></div>
+			<div class="color-palette__item color-palette__item_color_green" title="Зеленый" data-color="green"></div>
+			<div class="color-palette__item color-palette__item_color_blue" title="Синий" data-color="blue"></div>
+			<div class="color-palette__item color-palette__item_color_white" title="Белый" data-color="white"></div>
+			<div class="color-palette__item color-palette__item_color_black" title="Черный" data-color="black"></div>
 		</div>
-		<div class="pen-thickness-area">
-			<div id="pen_thickness_2" title="Pen: 2 px" data-thickness="2" class="div-area-item thickness div-area-item-thickness-select pen-thickness-2"></div>
-			<div id="pen_thickness_6" title="Pen: 6 px" data-thickness="6" class="div-area-item thickness pen-thickness-6"></div>
-			<div id="pen_thickness_12" title="Pen: 12 px" data-thickness="12" class="div-area-item thickness pen-thickness-12"></div>
+		<div class="pen-thickness-palette">
+			<div class="pen-thickness-palette__item pen-thickness-palette__item_thickness_2 pen-thickness-palette__item_selected" title="2" data-thickness="2"></div>
+			<div class="pen-thickness-palette__item pen-thickness-palette__item_thickness_6" title="6" data-thickness="6"></div>
+			<div class="pen-thickness-palette__item pen-thickness-palette__item_thickness_12" title="12" data-thickness="12"></div>
 		</div>
-		<button id="clear_button">Очистить</button>
-		<button id="save_button">Сохранить</button>
+		<button class="button button_clear">Очистить</button>
+		<button class="button button_save">Сохранить</button>
 	</div>
 </div>
 </body>
